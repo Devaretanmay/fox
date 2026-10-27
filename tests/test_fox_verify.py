@@ -79,7 +79,7 @@ class FoxVerifyContractTests(unittest.TestCase):
 class FoxVerifyEvaluationFixtureTests(unittest.TestCase):
     def test_detached_worktree_mutation_preserves_original_checkout(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             repository = root / "repository"
             isolated = root / "isolated-worktree"
             repository.mkdir()
@@ -144,7 +144,7 @@ class FoxVerifyEvaluationFixtureTests(unittest.TestCase):
 
     def test_detached_head_worktree_omits_uncommitted_target_changes(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             repository = root / "repository"
             isolated = root / "isolated-worktree"
             repository.mkdir()
