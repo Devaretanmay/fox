@@ -38,8 +38,8 @@ class SkillIndependenceInstallationTests(unittest.TestCase):
                 for absent in set(install.AVAILABLE_SKILLS) - {selected}:
                     self.assertFalse((destinations[0].parent / absent).exists())
 
-    def test_all_and_explicit_complete_selection_install_four_skills(self):
-        for selection in ("all", "fox,fox-explore,fox-review,fox-fragments"):
+    def test_all_and_explicit_complete_selection_install_five_skills(self):
+        for selection in ("all", "fox,fox-explore,fox-review,fox-verify,fox-fragments"):
             workspace = self.project / selection.replace(",", "-")
             workspace.mkdir()
             destinations = install.install("codex", workspace, skill=selection)
@@ -82,6 +82,15 @@ class SkillIndependentExecutionTests(unittest.TestCase):
             self.assertFalse((review_dir.parent / "fox").exists())
             self.assertFalse((review_dir.parent / "fox-explore").exists())
 
+    def test_fox_verify_has_no_runtime_dependency(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp)
+            verify_dir = install.install("claude", workspace, skill="fox-verify")[0]
+            self.assertTrue((verify_dir / "references/adversarial-playbook.md").is_file())
+            self.assertFalse((verify_dir / "scripts").exists())
+            self.assertFalse((verify_dir.parent / "fox").exists())
+            self.assertFalse((verify_dir.parent / "fox-review").exists())
+
 
 class ActivationContractTests(unittest.TestCase):
     """Check benchmark labels and metadata coverage, not model selection behavior."""
@@ -93,14 +102,17 @@ class ActivationContractTests(unittest.TestCase):
         cls.explore = (ROOT / "skills/fox-explore/SKILL.md").read_text(encoding="utf-8").lower()
         cls.fragments = (ROOT / "skills/fox-fragments/SKILL.md").read_text(encoding="utf-8").lower()
         cls.review = (ROOT / "skills/fox-review/SKILL.md").read_text(encoding="utf-8").lower()
+        cls.verify = (ROOT / "skills/fox-verify/SKILL.md").read_text(encoding="utf-8").lower()
 
     def test_positive_and_negative_activation_cases_exist(self):
         labels = [set(task["expected_activation"]) for task in self.tasks]
         self.assertIn({"fox"}, labels)
         self.assertIn({"fox-explore"}, labels)
         self.assertIn({"fox-review"}, labels)
+        self.assertIn({"fox-verify"}, labels)
         self.assertIn({"fox", "fox-explore"}, labels)
         self.assertIn({"fox", "fox-review"}, labels)
+        self.assertIn({"fox-review", "fox-verify"}, labels)
         self.assertIn(set(), labels)
 
     def test_descriptions_contain_positive_and_negative_triggers(self):
@@ -110,9 +122,12 @@ class ActivationContractTests(unittest.TestCase):
         self.assertIn("do not use", self.explore)
         self.assertIn("use for", self.review)
         self.assertIn("do not use", self.review)
+        self.assertIn("use when", self.verify)
+        self.assertIn("do not use", self.verify)
         self.assertIn("trivial edits", self.fox)
         self.assertIn("repair defects", self.explore)
         self.assertIn("do not use to repair defects", self.review)
+        self.assertIn("ordinary test run", self.verify)
 
     def test_activation_cases_reference_only_supported_skills(self):
         supported = set(install.AVAILABLE_SKILLS)
@@ -146,6 +161,7 @@ class EvaluationFixtureTests(unittest.TestCase):
         self.assertIn("repair-wrapper-timeout: repair", result.stdout)
         self.assertIn("explore-request-flow: explore", result.stdout)
         self.assertIn("review-tenant-regression: review", result.stdout)
+        self.assertIn("verify-weak-assertion: verify", result.stdout)
 
     def test_review_fixtures_prepare_clean_candidate_commits(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -158,6 +174,28 @@ class EvaluationFixtureTests(unittest.TestCase):
                     "--agent-command", "true",
                     "--task", "review-tenant-regression",
                     "--task", "review-clean-change",
+                    "--output", str(output),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            records = json.loads(output.read_text(encoding="utf-8"))["results"]
+            self.assertEqual(len(records), 2)
+            self.assertTrue(all(record["human_review_required"] for record in records))
+            self.assertTrue(all(record["changed_files"] == [] for record in records))
+
+    def test_verify_evaluation_keeps_human_grading_and_read_only_scoring(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "verify-results.json"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "evals/run.py"),
+                    "--variant", "fox-verify",
+                    "--agent-command", "true",
+                    "--task", "verify-weak-assertion",
+                    "--task", "verify-strong-contract",
                     "--output", str(output),
                 ],
                 capture_output=True,

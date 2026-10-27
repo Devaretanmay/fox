@@ -28,9 +28,10 @@ def install_variant(workspace: Path, variant: str) -> None:
         "fox": ["fox"],
         "fox-explore": ["fox-explore"],
         "fox-review": ["fox-review"],
+        "fox-verify": ["fox-verify"],
         "fox-fragments": ["fox-fragments"],
         "both": ["fox", "fox-explore"],
-        "all": ["fox", "fox-explore", "fox-review", "fox-fragments"],
+        "all": ["fox", "fox-explore", "fox-review", "fox-verify", "fox-fragments"],
     }.get(variant, [])
     for agent_dir in (workspace / ".agents/skills", workspace / ".claude/skills"):
         for name in names:
@@ -148,7 +149,7 @@ def run_task(task: dict, variant: str, agent_command: str, timeout: int) -> dict
             "tool_calls": tool_calls,
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
-            "human_review_required": task["kind"] in {"explore", "review"},
+            "human_review_required": task["kind"] in {"explore", "review", "verify"},
             "rubric": task.get("rubric", []),
             "agent_output": agent.stdout[-12000:],
             "agent_error": agent.stderr[-4000:],
@@ -169,7 +170,7 @@ def summarize(records: list[dict]) -> dict:
         "tool_calls": sum(record["tool_calls"] for record in valid if record["tool_calls"] is not None) if any(record["tool_calls"] is not None for record in valid) else None,
         "input_tokens": sum(record["input_tokens"] for record in valid if record["input_tokens"] is not None) if any(record["input_tokens"] is not None for record in valid) else None,
         "output_tokens": sum(record["output_tokens"] for record in valid if record["output_tokens"] is not None) if any(record["output_tokens"] is not None for record in valid) else None,
-        "note": "Usage metrics remain null unless the selected agent emits JSONL with tool or token fields. Exploration and review quality require blind human grading against the stored rubric.",
+        "note": "Usage metrics remain null unless the selected agent emits JSONL with tool or token fields. Exploration, review, and adversarial-verification quality require blind human grading against the stored rubric.",
     }
 
 
@@ -177,7 +178,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--variant",
-        choices=["baseline", "fox", "fox-explore", "fox-review", "fox-fragments", "both", "all"],
+        choices=["baseline", "fox", "fox-explore", "fox-review", "fox-verify", "fox-fragments", "both", "all"],
         required=True,
     )
     parser.add_argument("--agent-command", help="Command template containing {workspace} and {prompt}")
@@ -188,7 +189,7 @@ def main() -> int:
     args = parser.parse_args()
 
     tasks = load_tasks()
-    runnable = [task for task in tasks if task["kind"] in {"repair", "explore", "review"}]
+    runnable = [task for task in tasks if task["kind"] in {"repair", "explore", "review", "verify"}]
     if args.list:
         for task in tasks:
             print(f"{task['id']}: {task['kind']}")

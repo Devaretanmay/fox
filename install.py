@@ -16,7 +16,7 @@ AGENTS = {
 }
 ROOT = Path(__file__).resolve().parent
 
-AVAILABLE_SKILLS = ["fox", "fox-explore", "fox-review", "fox-fragments"]
+AVAILABLE_SKILLS = ["fox", "fox-explore", "fox-review", "fox-verify", "fox-fragments"]
 LEGACY_BOTH_SKILLS = ["fox", "fox-explore"]
 
 
@@ -160,17 +160,21 @@ def print_success_guidance(dests: list[Path], agent: str, skill: str) -> None:
         print('  "Use Fox Fragments and read only the instructions needed for this task."')
     elif skill == "fox-review":
         print('  "Review the last commit for correctness, regressions, missing tests, and unnecessary complexity. Do not edit files."')
+    elif skill == "fox-verify":
+        print('  "Challenge whether these tests detect meaningful regressions. Use isolated mutations and do not edit the working tree."')
     else:
         print('  Fox:         "Investigate why this function returns the wrong result. Find the cause, fix it, and verify the change."')
         print('  Fox Explore: "Explain this repository architecture, trace the request flow, and advise on scaling limits."')
         print('  Fox Review:  "Review the last commit for correctness and regression risks without editing files."')
+        print('  Fox Verify:  "Test whether the new checks fail when the required behavior is broken."')
         print('  Fox Fragments: "Select and load only the guidance needed for this task."')
-        print('  Combined:    "Explore the design, implement the authorized repair, then review the resulting diff."')
+        print('  Combined:    "Explore the design, repair it, review the diff, then challenge the verification evidence."')
 
     print("\nHow to verify it loaded:")
     print("  Look for Fox's 4-step workflow (Ground, Trace, Repair, Verify)")
     print("  Fox Explore's 4-stage exploration (Scope, Map, Compare, Report),")
-    print("  or Fox Review's 4-stage audit (Target, Trace, Validate, Report).")
+    print("  Fox Review's 4-stage audit (Target, Trace, Validate, Report),")
+    print("  or Fox Verify's adversarial checks (Claim, Inspect, Challenge, Report).")
 
     print("\nIf the agent does not recognize the skill:")
     print("  1. Restart your coding agent session to refresh installed skills.")
@@ -181,7 +185,7 @@ def print_success_guidance(dests: list[Path], agent: str, skill: str) -> None:
 
 def run_interactive_wizard() -> int:
     print("\nWelcome to Fox Setup")
-    print("Better fixes. Clear exploration. Verified reviews.\n")
+    print("Better fixes. Clear exploration. Verified reviews. Stronger evidence.\n")
 
     # Step 1: Agent selection
     print("1. Which AI coding agent do you use?")
@@ -216,16 +220,17 @@ def run_interactive_wizard() -> int:
         ("fox-explore", "Fox Explore: Understand your code (architecture, research & recommendations)"),
         ("fox-review", "Fox Review: Audit a change (correctness, risk & unnecessary complexity)"),
         ("fox-fragments", "Fox Fragments: Load focused guidance on demand"),
-        ("all", "All four skills (full suite)"),
+        ("all", "All five skills (full suite)"),
+        ("fox-verify", "Fox Verify: Challenge whether tests detect meaningful regressions"),
     ]
     for idx, (_, label) in enumerate(skill_options, 1):
         print(f"   [{idx}] {label}")
-    print("   Or enter a comma-separated combination (e.g. 1,3 or fox,fox-review)")
+    print("   Or enter a comma-separated combination (e.g. 1,6 or fox,fox-verify)")
 
     skill_choice = None
     while skill_choice is None:
         try:
-            raw = input("   Select an option [1-5] (default: 5): ").strip()
+            raw = input("   Select an option [1-6] (default: 5): ").strip()
         except (EOFError, KeyboardInterrupt):
             print("\nSetup cancelled.")
             return 1
@@ -240,7 +245,7 @@ def run_interactive_wizard() -> int:
             resolved = []
             valid = True
             for p in parts:
-                if p.isdigit() and 1 <= int(p) <= 4:
+                if p.isdigit() and int(p) in {1, 2, 3, 4, 6}:
                     resolved.append(skill_options[int(p) - 1][0])
                 elif p in AVAILABLE_SKILLS:
                     resolved.append(p)
@@ -250,7 +255,7 @@ def run_interactive_wizard() -> int:
             if valid and resolved:
                 skill_choice = ",".join(resolved)
                 break
-        print("   Please enter 1 through 5, or a combination like 1,4.")
+        print("   Please enter 1 through 6, or a combination like 1,6.")
 
     # Step 3: Location (Project vs Global)
     is_global = False
@@ -341,7 +346,7 @@ def main(argv=None) -> int:
     p.add_argument(
         "--skill",
         default="fox",
-        help="Skill to install: fox, fox-explore, fox-review, fox-fragments, all, both, or comma-separated (default: fox)",
+        help="Skill to install: fox, fox-explore, fox-review, fox-verify, fox-fragments, all, both, or comma-separated (default: fox)",
     )
     p.add_argument(
         "--project",

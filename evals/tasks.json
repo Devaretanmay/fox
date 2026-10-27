@@ -84,6 +84,38 @@
     ]
   },
   {
+    "id": "verify-weak-assertion",
+    "kind": "verify",
+    "fixture": "fixtures/verify-weak",
+    "prompt": "Assess whether the pricing tests enforce CONTRACT.md. Challenge the evidence with a small contract-relevant mutation in isolation, report the exact result, and do not modify the working tree.",
+    "test_command": ["python3", "-m", "unittest", "-v"],
+    "allowed_changes": [],
+    "must_change": [],
+    "expected_activation": ["fox-verify"],
+    "rubric": [
+      "Runs or accounts for the passing unmodified baseline",
+      "Shows that a meaningful wrong member price survives the weak non-null assertion",
+      "Explains the observable pricing consequence instead of relying on assertion-count heuristics",
+      "Uses isolation and leaves the repository unchanged"
+    ]
+  },
+  {
+    "id": "verify-strong-contract",
+    "kind": "verify",
+    "fixture": "fixtures/verify-strong",
+    "prompt": "Assess whether the pricing tests enforce CONTRACT.md using proportionate adversarial checks. Report only verified gaps, include limits, and do not modify the working tree.",
+    "test_command": ["python3", "-m", "unittest", "-v"],
+    "allowed_changes": [],
+    "must_change": [],
+    "expected_activation": ["fox-verify"],
+    "rubric": [
+      "Runs or accounts for the passing unmodified baseline",
+      "Challenges member, non-member, rounding, or negative-input behavior with meaningful isolated mutations",
+      "Reports no verified gap when the selected meaningful challenges are killed",
+      "Does not claim complete test-suite proof and leaves the repository unchanged"
+    ]
+  },
+  {
     "id": "negative-trivial-edit",
     "kind": "activation",
     "prompt": "Fix the typo recieve to receive in README.md.",
@@ -94,6 +126,24 @@
     "kind": "activation",
     "prompt": "Add CSV export to the reports page. There is no reported defect.",
     "expected_activation": []
+  },
+  {
+    "id": "verify-tests-with-mutation",
+    "kind": "activation",
+    "prompt": "Use targeted mutation testing to determine whether these new tests actually detect broken authorization behavior. Do not edit the working tree.",
+    "expected_activation": ["fox-verify"]
+  },
+  {
+    "id": "negative-ordinary-test-run",
+    "kind": "activation",
+    "prompt": "Run the existing unit test command and tell me whether it passes.",
+    "expected_activation": []
+  },
+  {
+    "id": "review-and-verify-change",
+    "kind": "activation",
+    "prompt": "Review this pull request for defects, then independently challenge whether its tests detect a broken tenant guard. Do not edit files.",
+    "expected_activation": ["fox-review", "fox-verify"]
   },
   {
     "id": "review-change-regression",

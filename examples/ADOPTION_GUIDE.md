@@ -1,6 +1,6 @@
 # Fox skills adoption guide
 
-This guide shows when to use Fox, Fox Explore, Fox Review, or a sequence of them.
+This guide shows when to use Fox, Fox Explore, Fox Review, Fox Verify, or a sequence of them.
 
 ---
 
@@ -13,8 +13,10 @@ This guide shows when to use Fox, Fox Explore, Fox Review, or a sequence of them
 | **Onboard to an unfamiliar repository or component** | **Fox Explore alone** | Explains the request flow, identifies architectural patterns, and provides a clear map of the codebase without editing files. |
 | **Evaluate trade-offs or compare external alternatives** | **Fox Explore alone** | Researches standard open-source libraries and protocols, compares architectural options, and advises on trade-offs. |
 | **Review a diff, branch, commit, or pull request** | **Fox Review alone** | Audits the exact change and connected behavior, validates findings, and leaves files unchanged. |
+| **Determine whether green tests detect broken behavior** | **Fox Verify alone** | Defines observable invariants and challenges the evidence with configured mutation tools or isolated targeted mutations. |
 | **Plan an architectural refactor and implement it safely** | **Fox Explore + Fox** | Fox Explore evaluates alternatives and advises on design trade-offs first; Fox implements the minimal complete fix with verification. |
 | **Review findings and then repair them** | **Fox Review + Fox** | Fox Review produces an independent evidence-backed report; Fox implements only the authorized verified findings. |
+| **Repair, then challenge the regression test** | **Fox + Fox Verify** | Fox repairs and tests the defect; Fox Verify independently checks whether the regression test fails when the behavior is broken. |
 
 ---
 
@@ -118,7 +120,7 @@ A service experiences intermittent authentication failures during slight server 
 +-------------------------------------------------------------------+
 | 4. Verify & Deliver (Fox)                                         |
 |    - Run reproducer to confirm it passes                          |
-|    - Run full test suite to guarantee zero regressions            |
+|    - Run proportionate regression checks and report limits        |
 +-------------------------------------------------------------------+
 ```
 
@@ -149,6 +151,26 @@ verified actionable findings. Do not edit files.
 
 ---
 
+## Example 5: Adversarial Test Verification (Fox Verify Alone)
+
+### Scenario
+A pricing change has a green test that only checks `result is not None`. The team wants evidence that the test detects an incorrect member discount, without changing the branch.
+
+### Sample Prompt
+```text
+/fox-verify Assess whether the pricing tests enforce CONTRACT.md. Establish the passing
+baseline, challenge the member-discount behavior with one isolated mutation, report the
+exact result and limits, and leave the working tree unchanged.
+```
+
+### Agent Workflow with Fox Verify
+1. **Establish the claim**: State that a member price of 1000 cents must produce 900 cents and confirm the unmodified test passes.
+2. **Inspect the evidence path**: Trace the member branch to the test and observe what the assertion can detect.
+3. **Challenge safely**: In a disposable copy, replace the discount result with the original price and run only the relevant test.
+4. **Report**: If the test still passes, report the surviving mutation and pricing consequence. Do not call it fraud based only on the weak assertion's shape, and do not edit the user's checkout.
+
+---
+
 ## Best Practices for Prompting Coding Agents
 
 Coding agents choose skills based on the terminology in user requests:
@@ -156,4 +178,5 @@ Coding agents choose skills based on the terminology in user requests:
 1. **To trigger Fox**: Use action words related to diagnosis and repair: `investigate root cause`, `fix defect`, `minimal fix`, `reproduce bug`, `verify regressions`.
 2. **To trigger Fox Explore**: Use words related to understanding and analysis: `explain architecture`, `walk me through`, `explore alternatives`, `compare implementations`, `advise on trade-offs`.
 3. **To trigger Fox Review**: Name the review target and use terms such as `review this diff`, `audit the last commit`, `review my PR`, or `pre-merge risk`.
-4. **To combine skills**: State the order and authorization boundary, such as read-only exploration, authorized implementation, then read-only review.
+4. **To trigger Fox Verify**: Ask to `test the tests`, `run targeted mutation testing`, `challenge this invariant`, or determine whether a green suite detects a named broken behavior. An ordinary request to run tests should not trigger it.
+5. **To combine skills**: State the order and authorization boundary, such as read-only exploration, authorized implementation, read-only review, then isolated adversarial verification.

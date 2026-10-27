@@ -16,6 +16,9 @@ Primary sources:
 - https://developers.openai.com/blog/eval-skills
 - https://github.com/DietrichGebert/ponytail/blob/main/skills/ponytail/SKILL.md
 - https://github.com/DietrichGebert/ponytail/blob/main/skills/ponytail-review/SKILL.md
+- https://stryker-mutator.io/docs/mutation-testing-elements/mutant-states-and-metrics/
+- https://mutmut.readthedocs.io/en/latest/
+- https://pitest.org/quickstart/basic_concepts/
 
 ## Material changes
 
@@ -28,6 +31,8 @@ Primary sources:
 | `fox-review` added as an independent read-only skill | Reviewing an existing change is a distinct goal from exploring a system or repairing a known defect | Review metadata, boundary, installer, activation, clean-change, and defect-change tests |
 | Review findings require mechanism, consequence, evidence, and a counterexample check | Reduce speculative comments and false positives | Review instruction contracts plus behavioral task rubrics |
 | Behavioral evaluation runner and fixtures | Separate real agent evidence from instruction-text checks | Repair fixtures must fail before agent work; invalid agent processes are excluded |
+| `fox-verify` adversarial verification skill | Test strength has a distinct read-only target and evidence model from implementation repair or general change review | Metadata and isolation contracts; weak and strong mutation fixtures; standalone and combined installer coverage |
+| Mutation outcome and false-positive controls | Established tools distinguish killed, survived, uncovered, invalid and timed-out mutants; a survivor or heuristic alone is not proof of “test theater” | Instruction contracts require baseline, target execution, semantic relevance and equivalent-mutant checks |
 
 ## Verification status
 
@@ -36,3 +41,9 @@ All deterministic tests pass. The live agent comparison is inconclusive because 
 ## October 24: Fox Review
 
 Fox Review is the third independently installable capability because change assessment has a different authorization boundary and output from exploration or repair. It is read-only, reports only evidence-backed findings, permits a clean “no findings” result, and hands authorized repairs to Fox. The benchmark now includes both a tenant-isolation regression and a clean change to measure missed defects and false positives.
+
+## October 27: Fox Verify
+
+Fox Verify turns the useful core of the VERICODE proposal into an honest agent skill. It does not claim to be a language-independent mutation engine or a deterministic pre-commit gate. It uses mutation tooling only when the repository already configures it; otherwise it performs a few contract-relevant challenges in an isolated copy. Mock ratio, assertion count, coverage, broad catches and structural similarity remain investigation signals rather than automatic failures.
+
+The behavioral manifest pairs a weak assertion fixture with a strong-suite control. Deterministic fixture tests prove that the same member-discount mutation survives the weak suite and is killed by the strong suite. This validates the benchmark mechanism, not agent reliability; matched repeated baseline and Fox Verify runs still require an authenticated agent environment and blind grading.
