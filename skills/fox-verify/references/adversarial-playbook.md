@@ -31,7 +31,29 @@ Avoid mutations that violate parsing, typing, imports, or setup before reaching 
 
 Use a repository-configured mutation tool when its scope and commands are already documented. Examples include Stryker, PIT, or mutmut, but their presence must be observed in the repository. Preserve the project's configured operators, test runner, exclusions, timeouts, and reports.
 
-Without configured tooling, create a disposable copy or isolated worktree outside the user's working tree. Apply exactly one small edit, run the targeted existing command with a timeout, record the diff and result, then discard the isolation. Do not commit, push, install dependencies, or leave generated mutation state in the repository.
+Without configured tooling, select isolation from the target state:
+
+| Target state | Preferred isolation | Required control |
+| --- | --- | --- |
+| Committed code in Git | Detached worktree at the exact commit | Use a unique temporary path outside the repository |
+| Staged, unstaged, or untracked code | Scoped disposable copy, or a worktree plus an exact transfer of every required change | Prove the isolated files match the intended target before mutation |
+| Non-Git project | Scoped disposable copy | Include the target package, tests, configuration, and runtime inputs needed by the check |
+
+For a committed target, the core operation is `git worktree add --detach -- <validated-temp-path> <exact-commit>`. Resolve the commit first and create the path with the platform's secure temporary-directory facility. Do not use a predictable sibling such as `../isolated-run`.
+
+A worktree created at `HEAD` omits staged, unstaged, and untracked changes. Never claim to verify those changes unless every required file and patch is transferred and its contents are checked. If faithful transfer or dependency closure is uncertain, report **blocked** instead of testing a different state.
+
+For a large repository, do not make a whole-tree copy. Prefer a worktree because Git shares object storage. If Git cannot be used, copy only the smallest complete package or module plus its tests, configuration, fixtures, generated inputs, and local dependencies. Exclude caches, dependency directories, and build outputs only after confirming the selected command does not require them. Check available space before any material copy.
+
+Use this lifecycle for every manual challenge:
+
+1. Record the original `git status --porcelain` output when available and hash or otherwise snapshot each target production and test file.
+2. Create the isolation outside the repository. Run the unmodified targeted check there and confirm that it matches the intended baseline.
+3. Apply exactly one small mutation, run the targeted command with a timeout, and record the mutation diff and result.
+4. Clean up through a guaranteed finalization path on success, failure, interruption, or timeout. Before removing a temporary worktree, confirm its exact path is registered by Git. Never use a broad or unresolved deletion target.
+5. Recheck the original status and target-file snapshots. If they changed, stop and report **working-tree contamination**; do not continue testing or repair the checkout without authorization.
+
+Do not stash, reset, clean, commit, push, install dependencies, or leave mutation state in the user's repository. If cleanup cannot be guaranteed, do not run the mutation.
 
 Never advertise a universal speed target. Mutation cost depends on the number of mutants, test selection, process startup, and suite runtime. Prefer a few high-value challenges over an unbounded sweep.
 

@@ -4,9 +4,11 @@ Date: 27 October 2026
 
 ## Deterministic verification
 
-- `python3 -m unittest discover -s tests -v`: 107 tests passed.
+- `python3 -m unittest discover -s tests -v`: 109 tests passed.
 - Coverage includes installer compatibility for four supported agents; independent and combined installation of all five skills; optional utilities; reference integrity; activation-label fixtures; review candidate setup; failing repair-fixture validation; and Fox Verify's weak/strong mutation controls.
 - The verification fixture check establishes a passing baseline in both fixtures, replaces the member discount with the undiscounted price, confirms that this mutation survives the weak non-null suite, and confirms that the strong contract suite kills it.
+- The worktree isolation check mutates a detached temporary worktree, removes it, and confirms that the original file bytes and `git status` output remain unchanged.
+- A dirty-checkout control confirms that a detached worktree at `HEAD` does not contain uncommitted target changes, preventing false verification of the wrong source state.
 - These results verify repository behavior and instruction contracts. They do not demonstrate that an AI agent follows the skills.
 
 ## Behavioral comparison

@@ -4,7 +4,7 @@ description: Adversarially evaluates whether tests and other verification eviden
 license: MIT
 compatibility: Works with coding agents; uses repository-native test and mutation tools without adding dependencies.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 # Fox Verify
 
@@ -24,7 +24,9 @@ Treat broad exception handling and similar-looking utilities the same way: prove
 
 ## 3. Challenge safely
 
-Prefer a mutation tool already configured by the repository. Do not install packages or introduce configuration. Otherwise use a disposable copy or isolated worktree, change one behavior at a time, run the smallest relevant test, and discard the copy. Never mutate the user's working tree.
+Prefer a mutation tool already configured by the repository. Do not install packages or introduce configuration. Otherwise choose faithful isolation: a temporary detached worktree for committed code, or a scoped disposable copy for uncommitted or non-Git code. Never copy a large repository wholesale. If the target or its dependencies cannot be reproduced safely, report **blocked**.
+
+Record the original checkout state, change one behavior at a time, run the smallest relevant test, and clean up on every exit path. Then confirm that the original status and target files are unchanged. Never mutate the user's working tree or stash, reset, or clean it.
 
 Choose contract-relevant challenges such as inverting a boundary, replacing a meaningful return, omitting a required side effect, or forcing a dependency failure. Classify every attempt as **killed**, **survived**, **not covered**, **invalid**, **timed out**, or **blocked**. Recheck suspicious results when flakiness is plausible.
 
