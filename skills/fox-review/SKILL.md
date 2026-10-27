@@ -2,11 +2,10 @@
 name: fox-review
 description: Reviews an existing code change for correctness, security, regressions, tests, performance, compatibility, and unnecessary complexity. Use for requested review of a diff, pull request, branch, commit, staged changes, or named files. Do not use to repair defects, implement features, analyze whole-codebase architecture, or proofread trivial text.
 license: MIT
-compatibility: Works with coding agents; uses host repository and test tools in read-only mode.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
-# Fox Review
+# Fox Change Review
 
 Review the change that exists, prove each finding, and leave the repository unchanged. Optimize for defects the author would act on, not the number of comments.
 

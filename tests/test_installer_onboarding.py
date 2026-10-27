@@ -112,6 +112,13 @@ class InstallerOnboardingTests(unittest.TestCase):
         self.assertTrue((self.project_dir / ".claude/skills/fox-review/SKILL.md").is_file())
         self.assertFalse((self.project_dir / ".claude/skills/fox-explore").exists())
 
+    def test_public_names_keep_stable_install_ids(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("**Fox Change Review** (`fox-review`)", readme)
+        self.assertIn("**Fox Test Audit** (`fox-verify`)", readme)
+        self.assertIn("name: fox-review", (ROOT / "skills/fox-review/SKILL.md").read_text(encoding="utf-8"))
+        self.assertIn("name: fox-verify", (ROOT / "skills/fox-verify/SKILL.md").read_text(encoding="utf-8"))
+
     def test_legacy_both_alias_keeps_original_pair(self):
         dests = install.install(agent="claude", project=self.project_dir, skill="both")
         self.assertEqual({path.name for path in dests}, {"fox", "fox-explore"})

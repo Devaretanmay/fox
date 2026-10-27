@@ -159,22 +159,22 @@ def print_success_guidance(dests: list[Path], agent: str, skill: str) -> None:
     elif skill == "fox-fragments":
         print('  "Use Fox Fragments and read only the instructions needed for this task."')
     elif skill == "fox-review":
-        print('  "Review the last commit for correctness, regressions, missing tests, and unnecessary complexity. Do not edit files."')
+        print('  "Use Fox Change Review to audit the last commit for correctness, regressions, missing tests, and unnecessary complexity. Do not edit files."')
     elif skill == "fox-verify":
-        print('  "Challenge whether these tests detect meaningful regressions. Use isolated mutations and do not edit the working tree."')
+        print('  "Use Fox Test Audit to challenge whether these tests detect meaningful regressions. Use isolated mutations and do not edit the working tree."')
     else:
         print('  Fox:         "Investigate why this function returns the wrong result. Find the cause, fix it, and verify the change."')
         print('  Fox Explore: "Explain this repository architecture, trace the request flow, and advise on scaling limits."')
-        print('  Fox Review:  "Review the last commit for correctness and regression risks without editing files."')
-        print('  Fox Verify:  "Test whether the new checks fail when the required behavior is broken."')
+        print('  Fox Change Review: "Review the last commit for correctness and regression risks without editing files."')
+        print('  Fox Test Audit:    "Test whether the new checks fail when the required behavior is broken."')
         print('  Fox Fragments: "Select and load only the guidance needed for this task."')
         print('  Combined:    "Explore the design, repair it, review the diff, then challenge the verification evidence."')
 
     print("\nHow to verify it loaded:")
     print("  Look for Fox's 4-step workflow (Ground, Trace, Repair, Verify)")
     print("  Fox Explore's 4-stage exploration (Scope, Map, Compare, Report),")
-    print("  Fox Review's 4-stage audit (Target, Trace, Validate, Report),")
-    print("  or Fox Verify's adversarial checks (Claim, Inspect, Challenge, Report).")
+    print("  Fox Change Review's 4-stage audit (Target, Trace, Validate, Report),")
+    print("  or Fox Test Audit's adversarial checks (Claim, Inspect, Challenge, Report).")
 
     print("\nIf the agent does not recognize the skill:")
     print("  1. Restart your coding agent session to refresh installed skills.")
@@ -185,7 +185,7 @@ def print_success_guidance(dests: list[Path], agent: str, skill: str) -> None:
 
 def run_interactive_wizard() -> int:
     print("\nWelcome to Fox Setup")
-    print("Better fixes. Clear exploration. Verified reviews. Stronger evidence.\n")
+    print("Better fixes. Clear exploration. Evidence-backed reviews. Stronger tests.\n")
 
     # Step 1: Agent selection
     print("1. Which AI coding agent do you use?")
@@ -218,10 +218,10 @@ def run_interactive_wizard() -> int:
     skill_options = [
         ("fox", "Fox: Fix what's broken (root-cause debugging and verified repair)"),
         ("fox-explore", "Fox Explore: Understand your code (architecture, research & recommendations)"),
-        ("fox-review", "Fox Review: Audit a change (correctness, risk & unnecessary complexity)"),
-        ("fox-fragments", "Fox Fragments: Load focused guidance on demand"),
-        ("all", "All five skills (full suite)"),
-        ("fox-verify", "Fox Verify: Challenge whether tests detect meaningful regressions"),
+        ("fox-review", "Fox Change Review: Audit a change (correctness, risk & unnecessary complexity)"),
+        ("fox-fragments", "Fox Fragments: Use the compact alternative workflow"),
+        ("all", "All five packages (specialists plus compact router)"),
+        ("fox-verify", "Fox Test Audit: Challenge whether tests detect meaningful regressions"),
     ]
     for idx, (_, label) in enumerate(skill_options, 1):
         print(f"   [{idx}] {label}")

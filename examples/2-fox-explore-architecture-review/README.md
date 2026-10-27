@@ -1,4 +1,4 @@
-# Example 2: Architecture Review & Codebase Exploration (Fox Explore)
+# Example 2: Architecture Analysis & Codebase Exploration (Fox Explore)
 
 This example demonstrates using **Fox Explore** to explain unfamiliar code, research external alternatives, and evaluate trade-offs without editing files.
 

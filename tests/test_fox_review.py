@@ -16,10 +16,11 @@ class FoxReviewMetadataTests(unittest.TestCase):
         self.assertTrue(content.startswith("---\n"))
         frontmatter = content.split("---\n", 2)[1]
         self.assertIn("name: fox-review", frontmatter)
-        self.assertIn('version: "0.1.0"', frontmatter)
+        self.assertIn('version: "0.1.1"', frontmatter)
         self.assertIn("license: MIT", frontmatter)
         self.assertIn("Use for", frontmatter)
         self.assertIn("Do not use", frontmatter)
+        self.assertIn("# Fox Change Review", content)
 
     def test_primary_instructions_are_concise(self):
         body = SKILL_MD.read_text(encoding="utf-8").split("---\n", 2)[2]

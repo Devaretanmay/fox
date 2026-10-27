@@ -1,6 +1,6 @@
 # Troubleshooting Fox skills
 
-This guide helps you resolve common issues when installing or using any of the five Fox skills.
+This guide covers the four Fox specialist skills and the optional Fox Fragments package.
 
 ---
 
@@ -18,7 +18,7 @@ You type `/fox`, `/fox-explore`, `/fox-review`, `/fox-verify`, or `/fox-fragment
    - **Claude Code**: `.claude/skills/<skill-name>`
    - **Cursor**: `.cursor/skills/<skill-name>`
 
-   Valid skill names are `fox`, `fox-explore`, `fox-review`, `fox-verify`, and `fox-fragments`.
+   Valid install IDs are `fox`, `fox-explore`, `fox-review`, `fox-verify`, and `fox-fragments`. The public names **Fox Change Review** and **Fox Test Audit** intentionally retain the stable IDs `fox-review` and `fox-verify`.
 3. **Explicitly reference the skill file**:
    If your agent UI does not support slash commands, simply paste your task prompt along with:
    ```text
@@ -65,12 +65,19 @@ Ask your agent to solve a bug or explore code. Look for these signs in its respo
 
 - **Fox**: The agent grounds the problem first, writes a reproducer, traces to the owning layer, applies a minimal fix, and verifies counterexamples.
 - **Fox Explore**: The agent provides grounded answers citing specific file paths, separates facts from inference, and advises on trade-offs without editing code.
-- **Fox Review**: The agent resolves a diff or commit target, traces connected behavior, reports evidence-backed findings first, and does not change files.
-- **Fox Verify**: The agent states an observable invariant, establishes a passing baseline, performs challenges only in isolation, classifies each outcome, and reports limits without changing the working tree.
+- **Fox Change Review**: The agent resolves a diff or commit target, traces connected behavior, reports evidence-backed findings first, and does not change files.
+- **Fox Test Audit**: The agent states an observable invariant, establishes a passing baseline, performs challenges only in isolation, classifies each outcome, and reports limits without changing the working tree.
 
-If Fox Review starts repairing code, stop the run and invoke it explicitly with: `Use fox-review in read-only mode. Report findings only.` Use `fox` separately when you authorize repairs.
+If Fox Change Review starts repairing code, stop the run and invoke it explicitly with: `Use fox-review in read-only mode. Report findings only.` Use `fox` separately when you authorize repairs.
 
-If Fox Verify edits the working tree, stop the run and invoke it with: `Use fox-verify. Perform any mutation only in a disposable copy and leave this checkout unchanged.` If no safe isolation is available, it should report the check as blocked instead of mutating in place.
+If Fox Test Audit edits the working tree, stop the run and invoke it with: `Use fox-verify. Perform any mutation only in a disposable copy and leave this checkout unchanged.` If no safe isolation is available, it should report the check as blocked instead of mutating in place.
+
+## 5. Which Package Set Should I Install?
+
+- Install one specialist when you need one full workflow.
+- Install `fox,fox-explore,fox-review,fox-verify` for the complete specialist suite.
+- Install `fox-fragments` by itself when low context use matters more than the full specialist playbooks.
+- `--skill all` remains available for compatibility and integration testing, but installs both delivery modes and is usually unnecessary for day-to-day use.
 
 If you need further help, open an issue at:
 https://github.com/Devaretanmay/fox/issues

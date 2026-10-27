@@ -1,4 +1,4 @@
-# Fox Verify adversarial playbook
+# Fox Test Audit playbook
 
 Load this reference when selecting challenges, interpreting mutation results, or distinguishing a real verification gap from a noisy heuristic.
 

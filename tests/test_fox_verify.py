@@ -23,7 +23,7 @@ class FoxVerifyMetadataTests(unittest.TestCase):
 
     def test_frontmatter_and_activation_boundaries(self):
         self.assertIn("name: fox-verify", self.frontmatter)
-        self.assertIn('version: "0.1.1"', self.frontmatter)
+        self.assertIn('version: "0.1.2"', self.frontmatter)
         description = next(
             line for line in self.frontmatter.splitlines() if line.startswith("description:")
         ).lower()
@@ -31,6 +31,7 @@ class FoxVerifyMetadataTests(unittest.TestCase):
         self.assertIn("do not use", description)
         self.assertIn("mutation testing", description)
         self.assertIn("ordinary test run", description)
+        self.assertIn("# Fox Test Audit", self.body)
 
     def test_primary_instructions_are_concise(self):
         self.assertLessEqual(len(self.body.split()), 500)

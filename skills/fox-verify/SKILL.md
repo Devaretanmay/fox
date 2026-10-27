@@ -2,11 +2,10 @@
 name: fox-verify
 description: Adversarially evaluates whether tests and other verification evidence detect meaningful behavior regressions. Use when asked to test the tests, run or interpret mutation testing, expose weak assertions or over-mocking, validate invariants, or determine whether a green suite actually proves a changed behavior. Do not use for an ordinary test run, feature implementation, root-cause repair, general code review, architecture research, or cosmetic edits.
 license: MIT
-compatibility: Works with coding agents; uses repository-native test and mutation tools without adding dependencies.
 metadata:
-  version: "0.1.1"
+  version: "0.1.2"
 ---
-# Fox Verify
+# Fox Test Audit
 
 Challenge the evidence, not merely the implementation. Leave the user's working tree unchanged.
 

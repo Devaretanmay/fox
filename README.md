@@ -1,16 +1,16 @@
 # Fox
 
-**Better fixes. Clear exploration. Verified reviews. Stronger evidence.**
+**Better fixes. Clear exploration. Evidence-backed reviews. Stronger tests.**
 
-Fox is a suite of five independent Agent Skills for AI coding assistants (Google Antigravity, Claude Code, Cursor, and OpenAI Codex):
+Fox is a dependency-free Agent Skill suite for AI coding assistants (Google Antigravity, Claude Code, Cursor, and OpenAI Codex). It provides four specialist workflows and one compact alternative:
 
 - **Fox**: Fix what's broken (root-cause debugging and verified repairs).
 - **Fox Explore**: Understand your code (architecture, research, and recommendations).
-- **Fox Review**: Audit an existing change (correctness, risk, tests, and unnecessary complexity).
-- **Fox Verify**: Challenge whether tests and verification evidence detect meaningful broken behavior.
-- **Fox Fragments**: Route each task to short, self-contained instruction fragments without loading the complete specialist skills.
+- **Fox Change Review** (`fox-review`): Audit an existing change (correctness, risk, tests, and unnecessary complexity).
+- **Fox Test Audit** (`fox-verify`): Challenge whether tests and verification evidence detect meaningful broken behavior.
+- **Fox Fragments**: A compact router that loads one short workflow at a time instead of the complete specialist skills.
 
-Each skill works alone. Install one, any combination, or all five.
+Every package works independently. Install the specialists you need, or use Fox Fragments as the lightweight alternative. Installing Fragments beside all four specialists is supported, but usually redundant.
 
 ---
 
@@ -20,10 +20,10 @@ Each skill works alone. Install one, any combination, or all five.
 | :--- | :--- | :--- |
 | **Fox** | **Fix what's broken.**<br>Investigates bugs, identifies root causes, applies focused repairs, and verifies results. | You have a bug to fix, an unexpected test failure, or code to debug. |
 | **Fox Explore** | **Understand your code. Explore what's possible.**<br>Explains unfamiliar code, researches external open-source alternatives, compares architectures, and advises on trade-offs. | You are onboarding to a repository, evaluating an architectural choice, or researching technical options. |
-| **Fox Review** | **Audit what changed.**<br>Reviews a diff, commit, branch, pull request, or named files for verified defects and regression risks without editing code. | You need an independent pre-merge review of an existing change. |
-| **Fox Verify** | **Test the tests.**<br>Defines observable invariants and uses configured mutation tools or isolated, targeted challenges to expose verification gaps. | A green suite may rely on weak assertions, over-mocking, or untested failure paths. |
+| **Fox Change Review**<br>`fox-review` | **Audit what changed.**<br>Reviews a diff, commit, branch, pull request, or named files for verified defects and regression risks without editing code. | You need an independent pre-merge review of an existing change. |
+| **Fox Test Audit**<br>`fox-verify` | **Test the tests.**<br>Defines observable invariants and uses configured mutation tools or isolated, targeted challenges to expose verification gaps. | A green suite may rely on weak assertions, over-mocking, or untested failure paths. |
 | **Fox Fragments** | **Load only what is needed.**<br>Maps a request to short repair, boundary, exploration, review and verification fragments. | You want minimal Fox guidance for each task without reading the full specialist skills. |
-| **All five** | **Understand, repair, review, and challenge the evidence.**<br>Each skill keeps its own boundary and can hand work to the next capability when authorized. | You want the complete engineering suite. |
+| **Specialist suite** | **Understand, repair, review, and challenge the evidence.**<br>Install `fox,fox-explore,fox-review,fox-verify`; each specialist keeps its own authorization boundary. | You want every full workflow and its detailed references. |
 
 ---
 
@@ -44,13 +44,13 @@ Or specify your agent and skill directly:
 
 ```bash
 # Google Antigravity or OpenAI Codex (installs to .agents/skills)
-python3 install.py --agent antigravity --skill all
+python3 install.py --agent antigravity --skill fox,fox-explore,fox-review,fox-verify
 
 # Anthropic Claude Code (installs to .claude/skills)
-python3 install.py --agent claude --skill all
+python3 install.py --agent claude --skill fox,fox-explore,fox-review,fox-verify
 
 # Cursor (installs to .cursor/skills)
-python3 install.py --agent cursor --skill all
+python3 install.py --agent cursor --skill fox,fox-explore,fox-review,fox-verify
 ```
 
 #### Install Specific Skills
@@ -61,20 +61,20 @@ python3 install.py --agent antigravity --skill fox
 # Install only Fox Explore
 python3 install.py --agent antigravity --skill fox-explore
 
-# Install only Fox Review
+# Install only Fox Change Review
 python3 install.py --agent antigravity --skill fox-review
 
-# Install only Fox Verify
+# Install only Fox Test Audit
 python3 install.py --agent antigravity --skill fox-verify
 
 # Install only Fox Fragments
 python3 install.py --agent antigravity --skill fox-fragments
 
-# Install a selected combination
-python3 install.py --agent antigravity --skill fox,fox-review
+# Install the four full specialist skills
+python3 install.py --agent antigravity --skill fox,fox-explore,fox-review,fox-verify
 ```
 
-The legacy `--skill both` alias still installs the original `fox` and `fox-explore` pair. Use `--skill all` for all five skills. To avoid loading full specialist skills, install only `fox-fragments`.
+The install IDs remain stable for compatibility: the public names **Fox Change Review** and **Fox Test Audit** still use `fox-review` and `fox-verify`. The legacy `--skill both` alias still installs the original `fox` and `fox-explore` pair. `--skill all` installs every package, including Fox Fragments; most users should choose either the four specialists or Fragments, not both.
 
 ---
 
@@ -88,23 +88,23 @@ Once installed, start a new chat in your AI coding agent and try one of these be
 ### If You Installed Fox Explore
 > "Explain this repository to someone seeing it for the first time. Walk me through the request flow and explain what you would improve and what you would leave alone."
 
-### If You Installed Fox Review
+### If You Installed Fox Change Review
 > "Review the last commit against its requirements. Report only verified correctness, security, regression, test, performance, or complexity findings. Do not edit files."
 
-### If You Installed Fox Verify
+### If You Installed Fox Test Audit
 > "Challenge whether these tests detect a broken tenant guard. Use configured tooling or isolated targeted mutations, report exact results, and leave the working tree unchanged."
 
 ### If You Installed Fox Fragments
 > "Use Fox Fragments to select only the instructions needed to diagnose this API failure."
 
-### If You Installed All Five
-> "Explore the caching design, implement the authorized repair with Fox, review the final diff, then use Fox Verify to challenge whether the regression tests detect broken behavior."
+### If You Installed Multiple Specialists
+> "Explore the caching design, implement the authorized repair with Fox, review the final diff with Fox Change Review, then use Fox Test Audit to challenge whether the regression tests detect broken behavior."
 
 ### How to Confirm It Loaded
 - **Fox**: Your agent writes a reproduction test first, traces execution to the owning component, applies a minimal fix, and runs verification checks.
 - **Fox Explore**: Your agent answers directly, grounds local explanations in real repository paths, separates facts from inferences, and provides practical recommendations without editing code.
-- **Fox Review**: Your agent identifies the exact target, reads connected code, validates each finding, and leaves the repository unchanged.
-- **Fox Verify**: Your agent defines an observable invariant, establishes a clean baseline, challenges it in isolation, distinguishes killed and survived mutations from invalid or uncovered ones, and leaves the working tree unchanged.
+- **Fox Change Review**: Your agent identifies the exact target, reads connected code, validates each finding, and leaves the repository unchanged.
+- **Fox Test Audit**: Your agent defines an observable invariant, establishes a clean baseline, challenges it in isolation, distinguishes killed and survived mutations from invalid or uncovered ones, and leaves the working tree unchanged.
 
 If your agent does not recognize a skill, restart the chat session or tell the agent:
 `Use instructions in .agents/skills/fox/SKILL.md`. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more tips.
@@ -124,8 +124,8 @@ header = wa.to_header()
 - **The bug**: `to_header()` returns `'Bearer '` with an illegal trailing space. Downstream HTTP parsers reject the request.
 - **With Fox Explore**: The agent explains the header specification RFC, compares the framework's token validation with standard libraries (such as `PyJWT` or `authlib`), and advises on backward compatibility trade-offs before changes are made.
 - **With Fox**: The agent traces execution to the owning serializer (`auth.py`), fixes formatting at the source, and ensures that `from_header("Bearer") == WWWAuthenticate("bearer")` holds true in both directions.
-- **With Fox Review**: The agent audits the resulting diff, callers, and tests; reports only reproducible risks; and makes no edits.
-- **With Fox Verify**: The agent challenges whether the tests fail when serialization produces the wrong header and reports the exact killed or surviving mutation without changing the checkout.
+- **With Fox Change Review**: The agent audits the resulting diff, callers, and tests; reports only reproducible risks; and makes no edits.
+- **With Fox Test Audit**: The agent challenges whether the tests fail when serialization produces the wrong header and reports the exact killed or surviving mutation without changing the checkout.
 
 For step-by-step walkthroughs of real defects and architectural reviews, see the [Adoption Guide](examples/ADOPTION_GUIDE.md).
 
@@ -152,15 +152,15 @@ Fox Explore provides read-only codebase understanding and technical research:
 3. **Compare**: Evaluate the current design, no change, and viable alternatives against consistent criteria.
 4. **Report**: Lead with the answer, cite evidence, separate observed facts from inferences and unknowns, and state what to retain.
 
-### Fox Review Lifecycle
-Fox Review audits an existing change without modifying it:
+### Fox Change Review Lifecycle
+Fox Change Review audits an existing change without modifying it:
 1. **Set the target**: Resolve the exact diff, base, requirements, and repository rules.
 2. **Trace the change**: Read connected callers, callees, tests, configuration, and contracts.
 3. **Validate findings**: Prove the failure mechanism, consequence, and counterexample before reporting it.
 4. **Report**: Order actionable findings by impact, disclose checks and limits, or state that no verified findings exist.
 
-### Fox Verify Lifecycle
-Fox Verify evaluates verification evidence without editing the working tree:
+### Fox Test Audit Lifecycle
+Fox Test Audit evaluates verification evidence without editing the working tree:
 1. **Establish the claim**: Resolve the behavior, observable invariant, target, and passing baseline.
 2. **Inspect the evidence path**: Trace production behavior into the tests, assertions, mocks, and failure paths that should observe it.
 3. **Challenge safely**: Use existing mutation tooling or one contract-relevant mutation at a time in an isolated copy.
@@ -169,9 +169,9 @@ Fox Verify evaluates verification evidence without editing the working tree:
 ## Advanced Setup
 
 ### Global Installation (Antigravity)
-To make skills available across all projects on your machine for Google Antigravity:
+To make the four specialists available across all projects on your machine for Google Antigravity:
 ```bash
-python3 install.py --agent antigravity --skill all --global
+python3 install.py --agent antigravity --skill fox,fox-explore,fox-review,fox-verify --global
 ```
 This installs skills to `~/.gemini/config/skills`.
 
@@ -179,10 +179,10 @@ This installs skills to `~/.gemini/config/skills`.
 The installer supports automation flags for CI or setup scripts:
 ```bash
 # Preview what would be installed without writing files
-python3 install.py --agent antigravity --skill all --dry-run
+python3 install.py --agent antigravity --skill fox,fox-explore,fox-review,fox-verify --dry-run
 
 # Safely replace an existing installation
-python3 install.py --agent antigravity --skill all --force --project /path/to/project
+python3 install.py --agent antigravity --skill fox,fox-explore,fox-review,fox-verify --force --project /path/to/project
 ```
 
 ### Advanced Fox Verification Utilities
@@ -211,8 +211,8 @@ python3 skills/fox/scripts/proof.py report cases/auth
 
 - **Skill guidance, not hard constraints**: Skills provide structured reasoning instructions for AI agents. They improve agent consistency, but cannot intercept models that ignore instructions.
 - **Read-only exploration**: Fox Explore is read-only by default and will not modify repository files or scaffold architectures unless explicitly requested.
-- **Read-only review**: Fox Review reports findings but never edits, commits, pushes, approves, merges, or posts review comments.
-- **Read-only adversarial verification**: Fox Verify may mutate a disposable copy, never the user's working tree. It does not install mutation tools and does not equate a survivor, mock count, or coverage percentage with fraud.
+- **Read-only review**: Fox Change Review reports findings but never edits, commits, pushes, approves, merges, or posts review comments.
+- **Read-only test audit**: Fox Test Audit may mutate a disposable copy, never the user's working tree. It does not install mutation tools and does not equate a survivor, mock count, or coverage percentage with fraud.
 - **Behavioral evidence is separate**: Metadata and instruction-contract tests check packaging, not agent reliability. See [behavioral evaluations](evals/README.md) for controlled baseline comparisons.
 - **Current evaluation status**: See [evaluation results](evals/RESULTS.md). Invalid agent runs are excluded rather than counted as failures.
 
